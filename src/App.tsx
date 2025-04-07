@@ -13,6 +13,13 @@ import EmploiDuTempsPage from "./pages/EmploiDuTemps";
 import AbsencesPage from "./pages/Absences";
 import NotificationsPage from "./pages/Notifications";
 import DocumentsPage from "./pages/Documents";
+import AdminLayout from "./components/AdminLayout";
+import AdminDashboard from "./pages/admin/Dashboard";
+import AdminEnseignants from "./pages/admin/Enseignants";
+import AdminEleves from "./pages/admin/Eleves";
+import AdminEmploiDuTemps from "./pages/admin/EmploiDuTemps";
+import AdminAbsences from "./pages/admin/Absences";
+import AdminCommunication from "./pages/admin/Communication";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +38,14 @@ const App = () => (
             <Route path="/absences" element={<AbsencesPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/documents" element={<DocumentsPage />} />
+          </Route>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="enseignants" element={<AdminEnseignants />} />
+            <Route path="eleves" element={<AdminEleves />} />
+            <Route path="emploi-du-temps" element={<AdminEmploiDuTemps />} />
+            <Route path="absences" element={<AdminAbsences />} />
+            <Route path="communication" element={<AdminCommunication />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
