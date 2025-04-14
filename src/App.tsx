@@ -20,6 +20,14 @@ import AdminEleves from "./pages/admin/Eleves";
 import AdminEmploiDuTemps from "./pages/admin/EmploiDuTemps";
 import AdminAbsences from "./pages/admin/Absences";
 import AdminCommunication from "./pages/admin/Communication";
+import ParentLayout from "./components/ParentLayout";
+import ParentDashboard from "./pages/parent/Dashboard";
+import ParentNotes from "./pages/parent/Notes";
+import ParentBulletins from "./pages/parent/Bulletins";
+import ParentAbsences from "./pages/parent/Absences";
+import ParentCalendrier from "./pages/parent/Calendrier";
+import ParentCommunication from "./pages/parent/Communication";
+import ParentNotifications from "./pages/parent/Notifications";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +54,15 @@ const App = () => (
             <Route path="emploi-du-temps" element={<AdminEmploiDuTemps />} />
             <Route path="absences" element={<AdminAbsences />} />
             <Route path="communication" element={<AdminCommunication />} />
+          </Route>
+          <Route path="/parent" element={<ParentLayout />}>
+            <Route index element={<ParentDashboard />} />
+            <Route path="notes" element={<ParentNotes />} />
+            <Route path="bulletins" element={<ParentBulletins />} />
+            <Route path="absences" element={<ParentAbsences />} />
+            <Route path="calendrier" element={<ParentCalendrier />} />
+            <Route path="communication" element={<ParentCommunication />} />
+            <Route path="notifications" element={<ParentNotifications />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
