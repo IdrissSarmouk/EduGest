@@ -1,654 +1,391 @@
-
 import { useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useLocation } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, MessageSquare, Plus, Users, FileText, CheckCircle, Pencil, Trash2, CalendarDays } from "lucide-react";
+import { Search } from "lucide-react";
 
-// Données simulées des conseils de classe
-const conseilsClasseMock = [
-  { id: 1, classe: "3ème B", trimestre: "1er Trimestre", date: "15/04/2025", heure: "17:00", lieu: "Salle B201", participants: ["Équipe pédagogique", "Délégués élèves", "Représentants parents"], statut: "Planifié" },
-  { id: 2, classe: "3ème A", trimestre: "1er Trimestre", date: "17/04/2025", heure: "17:00", lieu: "Salle A101", participants: ["Équipe pédagogique", "Délégués élèves", "Représentants parents"], statut: "Planifié" },
-  { id: 3, classe: "3ème C", trimestre: "1er Trimestre", date: "18/04/2025", heure: "17:00", lieu: "Salle C301", participants: ["Équipe pédagogique", "Délégués élèves", "Représentants parents"], statut: "Planifié" },
-  { id: 4, classe: "4ème A", trimestre: "1er Trimestre", date: "22/04/2025", heure: "17:00", lieu: "Salle A101", participants: ["Équipe pédagogique", "Délégués élèves", "Représentants parents"], statut: "À planifier" },
-  { id: 5, classe: "4ème B", trimestre: "1er Trimestre", date: "24/04/2025", heure: "17:00", lieu: "Salle B201", participants: ["Équipe pédagogique", "Délégués élèves", "Représentants parents"], statut: "À planifier" },
+const enseignants = [
+  { id: 1, nom: "M. Martin", matiere: "Mathématiques", email: "m.martin@ecole-digital.fr" },
+  { id: 2, nom: "M. Bernard", matiere: "Français", email: "m.bernard@ecole-digital.fr", principal: true },
+  { id: 3, nom: "Mme Dubois", matiere: "Histoire-Géographie", email: "mme.dubois@ecole-digital.fr" },
+  { id: 4, nom: "Mme Johnson", matiere: "Anglais", email: "mme.johnson@ecole-digital.fr" },
+  { id: 5, nom: "M. Petit", matiere: "SVT", email: "m.petit@ecole-digital.fr" },
+  { id: 6, nom: "Mme Leroy", matiere: "Physique-Chimie", email: "mme.leroy@ecole-digital.fr" },
+  { id: 7, nom: "M. Durand", matiere: "EPS", email: "m.durand@ecole-digital.fr" },
 ];
 
-// Données simulées des réunions pédagogiques
-const reunionsPedagogiquesMock = [
-  { id: 1, titre: "Réunion équipe mathématiques", date: "18/04/2025", heure: "14:30", lieu: "Salle des professeurs", participants: ["Équipe mathématiques", "Direction"], statut: "Planifiée" },
-  { id: 2, titre: "Réunion préparation examens", date: "25/04/2025", heure: "16:00", lieu: "Salle de réunion", participants: ["Ensemble des enseignants 3ème", "Direction"], statut: "Planifiée" },
-  { id: 3, titre: "Commission éducative", date: "02/05/2025", heure: "14:00", lieu: "Bureau du principal", participants: ["Direction", "CPE", "Professeurs principaux"], statut: "À planifier" },
+const administrationContacts = [
+  { id: 1, nom: "Vie scolaire", description: "Absences, retards et discipline", email: "vie-scolaire@ecole-digital.fr" },
+  { id: 2, nom: "Secrétariat", description: "Questions administratives", email: "secretariat@ecole-digital.fr" },
+  { id: 3, nom: "Direction", description: "Direction de l'établissement", email: "direction@ecole-digital.fr" },
+  { id: 4, nom: "Orientation", description: "Conseiller d'orientation", email: "orientation@ecole-digital.fr" },
+  { id: 5, nom: "Infirmerie", description: "Santé et soins", email: "infirmerie@ecole-digital.fr" },
 ];
 
-// Données simulées des notifications et communications
-const communicationsMock = [
-  { id: 1, titre: "Rappel dates conseils de classe", date: "05/04/2025", destinataires: ["Tous les enseignants"], statut: "Envoyé", type: "Notification" },
-  { id: 2, titre: "Information sur les examens blancs", date: "03/04/2025", destinataires: ["Parents", "Élèves 3ème"], statut: "Envoyé", type: "Email" },
-  { id: 3, titre: "Réunion parents-professeurs", date: "01/04/2025", destinataires: ["Parents"], statut: "Envoyé", type: "Email" },
-  { id: 4, titre: "Fermeture exceptionnelle CDI", date: "30/03/2025", destinataires: ["Tous"], statut: "Envoyé", type: "Notification" },
+const messagesRecents = [
+  { 
+    id: 1, 
+    expediteur: "M. Bernard", 
+    sujet: "Projet d'écriture", 
+    date: "15/03/2025", 
+    contenu: "Bonjour Mme Dupont, je vous contacte au sujet du projet d'écriture de Martin. Il a montré un réel talent dans son dernier travail et je pense qu'il pourrait participer au concours national de poésie. Pourriez-vous m'indiquer s'il serait intéressé ? Cordialement, M. Bernard.",
+    lu: false
+  },
+  { 
+    id: 2, 
+    expediteur: "Vie scolaire", 
+    sujet: "Absence du 15/03", 
+    date: "16/03/2025", 
+    contenu: "Bonjour, nous n'avons pas reçu de justificatif pour l'absence de Martin le 15/03. Merci de nous faire parvenir un mot d'excuse ou un certificat médical dans les plus brefs délais. Cordialement, Le service de vie scolaire.",
+    lu: false
+  },
+  { 
+    id: 3, 
+    expediteur: "Mme Dubois", 
+    sujet: "Sortie pédagogique", 
+    date: "10/03/2025", 
+    contenu: "Chers parents, une sortie pédagogique au musée d'histoire est prévue le 10/04. Merci de retourner l'autorisation signée avant le 30/03. Cordialement, Mme Dubois.",
+    lu: true
+  },
+  { 
+    id: 4, 
+    expediteur: "Direction", 
+    sujet: "Réunion parents-professeurs", 
+    date: "05/03/2025", 
+    contenu: "Madame, Monsieur, nous vous rappelons que la réunion parents-professeurs aura lieu le 22/03 de 18h à 20h. Vous pouvez prendre rendez-vous avec les enseignants via l'application. Cordialement, La Direction.",
+    lu: true
+  },
 ];
-
-// Liste des classes
-const classesList = ["3ème A", "3ème B", "3ème C", "4ème A", "4ème B", "4ème C", "5ème A", "5ème B", "5ème C", "6ème A", "6ème B"];
-
-// Liste des trimestres
-const trimestresList = ["1er Trimestre", "2ème Trimestre", "3ème Trimestre"];
-
-// Liste des types de destinataires
-const destinatairesList = ["Tous", "Tous les enseignants", "Parents", "Élèves", "Élèves 3ème", "Parents 3ème", "Direction", "Personnel administratif"];
-
-// Liste des lieux
-const lieuxList = ["Salle A101", "Salle B201", "Salle C301", "Salle des professeurs", "Salle de réunion", "CDI", "Gymnase", "Bureau du principal"];
-
-// Liste des types de communications
-const typesCommunicationList = ["Email", "Notification", "SMS"];
 
 const AdminCommunication = () => {
-  const [conseilsClasse, setConseilsClasse] = useState(conseilsClasseMock);
-  const [reunionsPedagogiques, setReunionsPedagogiques] = useState(reunionsPedagogiquesMock);
-  const [communications, setCommunications] = useState(communicationsMock);
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const teacherName = searchParams.get("teacher");
+  const adminDept = searchParams.get("admin");
   
-  const [isAddConseilDialogOpen, setIsAddConseilDialogOpen] = useState(false);
-  const [isAddReunionDialogOpen, setIsAddReunionDialogOpen] = useState(false);
-  const [isAddCommunicationDialogOpen, setIsAddCommunicationDialogOpen] = useState(false);
-  
-  const [nouveauConseil, setNouveauConseil] = useState({
-    classe: "",
-    trimestre: "",
-    date: "",
-    heure: "",
-    lieu: ""
+  const [activeTab, setActiveTab] = useState(() => {
+    if (teacherName) return "enseignants";
+    if (adminDept) return "administration";
+    return "messages";
   });
   
-  const [nouvelleReunion, setNouvelleReunion] = useState({
-    titre: "",
-    date: "",
-    heure: "",
-    lieu: "",
-    participants: ""
+  const [selectedContact, setSelectedContact] = useState<any>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [messageSubject, setMessageSubject] = useState("");
+  const [messageContent, setMessageContent] = useState("");
+  const [selectedMessage, setSelectedMessage] = useState<any>(null);
+  
+  // Filtrer les enseignants en fonction du terme de recherche
+  const filteredEnseignants = enseignants.filter(
+    e => e.nom.toLowerCase().includes(searchTerm.toLowerCase()) || 
+         e.matiere.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  
+  // Filtrer les contacts administratifs en fonction du terme de recherche
+  const filteredAdminContacts = administrationContacts.filter(
+    a => a.nom.toLowerCase().includes(searchTerm.toLowerCase()) || 
+         a.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  
+  // Effet au chargement pour sélectionner le contact en fonction des paramètres d'URL
+  useState(() => {
+    if (teacherName) {
+      const teacher = enseignants.find(t => t.nom.includes(teacherName));
+      if (teacher) setSelectedContact(teacher);
+    } else if (adminDept) {
+      const admin = administrationContacts.find(a => a.email.includes(adminDept));
+      if (admin) setSelectedContact(admin);
+    }
   });
   
-  const [nouvelleCommunication, setNouvelleCommunication] = useState({
-    titre: "",
-    message: "",
-    destinataires: "",
-    type: ""
-  });
-
-  // Ajouter un nouveau conseil de classe
-  const handleAddConseil = () => {
-    const newId = Math.max(...conseilsClasse.map(c => c.id)) + 1;
-    const nouveauConseilComplet = {
-      id: newId,
-      classe: nouveauConseil.classe,
-      trimestre: nouveauConseil.trimestre,
-      date: nouveauConseil.date,
-      heure: nouveauConseil.heure,
-      lieu: nouveauConseil.lieu,
-      participants: ["Équipe pédagogique", "Délégués élèves", "Représentants parents"],
-      statut: "Planifié"
-    };
-    
-    setConseilsClasse([...conseilsClasse, nouveauConseilComplet]);
-    setNouveauConseil({ classe: "", trimestre: "", date: "", heure: "", lieu: "" });
-    setIsAddConseilDialogOpen(false);
+  const handleSendMessage = () => {
+    // Ici vous implémenteriez la logique d'envoi du message
+    if (selectedContact && messageSubject && messageContent) {
+      alert(`Message envoyé à ${selectedContact.nom} : ${messageSubject}`);
+      setMessageSubject("");
+      setMessageContent("");
+      setSelectedContact(null);
+    }
   };
-
-  // Ajouter une nouvelle réunion pédagogique
-  const handleAddReunion = () => {
-    const newId = Math.max(...reunionsPedagogiques.map(r => r.id)) + 1;
-    const nouvelleReunionComplete = {
-      id: newId,
-      titre: nouvelleReunion.titre,
-      date: nouvelleReunion.date,
-      heure: nouvelleReunion.heure,
-      lieu: nouvelleReunion.lieu,
-      participants: [nouvelleReunion.participants],
-      statut: "Planifiée"
-    };
-    
-    setReunionsPedagogiques([...reunionsPedagogiques, nouvelleReunionComplete]);
-    setNouvelleReunion({ titre: "", date: "", heure: "", lieu: "", participants: "" });
-    setIsAddReunionDialogOpen(false);
-  };
-
-  // Envoyer une nouvelle communication
-  const handleAddCommunication = () => {
-    const newId = Math.max(...communications.map(c => c.id)) + 1;
-    const nouvelleCommunicationComplete = {
-      id: newId,
-      titre: nouvelleCommunication.titre,
-      date: new Date().toLocaleDateString("fr-FR"),
-      destinataires: [nouvelleCommunication.destinataires],
-      statut: "Envoyé",
-      type: nouvelleCommunication.type
-    };
-    
-    setCommunications([nouvelleCommunicationComplete, ...communications]);
-    setNouvelleCommunication({ titre: "", message: "", destinataires: "", type: "" });
-    setIsAddCommunicationDialogOpen(false);
-  };
-
-  // Supprimer un conseil de classe
-  const handleDeleteConseil = (id: number) => {
-    setConseilsClasse(conseilsClasse.filter(conseil => conseil.id !== id));
-  };
-
-  // Supprimer une réunion pédagogique
-  const handleDeleteReunion = (id: number) => {
-    setReunionsPedagogiques(reunionsPedagogiques.filter(reunion => reunion.id !== id));
-  };
-
+  
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Communication et gestion administrative</h1>
-        <p className="text-muted-foreground">
-          Gérez les conseils de classe, réunions pédagogiques et communications.
+        <h1 className="text-3xl font-bold tracking-tight">Communication</h1>
+        <p className="text-muted-foreground mt-2">
+          Échangez avec les enseignants et l'administration de l'établissement.
         </p>
       </div>
-
-      <Tabs defaultValue="conseils" className="w-full">
+      
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="mb-4">
-          <TabsTrigger value="conseils">Conseils de classe</TabsTrigger>
-          <TabsTrigger value="reunions">Réunions pédagogiques</TabsTrigger>
-          <TabsTrigger value="communications">Communications</TabsTrigger>
+          <TabsTrigger value="messages">Messages reçus</TabsTrigger>
+          <TabsTrigger value="enseignants">Enseignants</TabsTrigger>
+          <TabsTrigger value="administration">Administration</TabsTrigger>
+          <TabsTrigger value="nouveau">Nouveau message</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="conseils">
-          <div className="flex justify-between mb-4">
-            <h2 className="text-xl font-semibold">Planification des conseils de classe</h2>
-            <Dialog open={isAddConseilDialogOpen} onOpenChange={setIsAddConseilDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Planifier un conseil
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Planifier un conseil de classe</DialogTitle>
-                  <DialogDescription>
-                    Définissez les détails du conseil de classe à planifier.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label htmlFor="classe" className="text-sm font-medium">Classe</label>
-                      <Select 
-                        onValueChange={(value) => setNouveauConseil({...nouveauConseil, classe: value})}
-                        value={nouveauConseil.classe}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner une classe" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {classesList.map((classe) => (
-                            <SelectItem key={classe} value={classe}>{classe}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor="trimestre" className="text-sm font-medium">Trimestre</label>
-                      <Select 
-                        onValueChange={(value) => setNouveauConseil({...nouveauConseil, trimestre: value})}
-                        value={nouveauConseil.trimestre}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner un trimestre" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {trimestresList.map((trimestre) => (
-                            <SelectItem key={trimestre} value={trimestre}>{trimestre}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="date" className="text-sm font-medium">Date</label>
-                    <Input
-                      id="date"
-                      type="date"
-                      value={nouveauConseil.date}
-                      onChange={(e) => setNouveauConseil({...nouveauConseil, date: e.target.value})}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="heure" className="text-sm font-medium">Heure</label>
-                    <Input
-                      id="heure"
-                      type="time"
-                      value={nouveauConseil.heure}
-                      onChange={(e) => setNouveauConseil({...nouveauConseil, heure: e.target.value})}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="lieu" className="text-sm font-medium">Lieu</label>
-                    <Select 
-                      onValueChange={(value) => setNouveauConseil({...nouveauConseil, lieu: value})}
-                      value={nouveauConseil.lieu}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner un lieu" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {lieuxList.map((lieu) => (
-                          <SelectItem key={lieu} value={lieu}>{lieu}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+        <TabsContent value="messages">
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card className="md:col-span-1">
+              <CardHeader>
+                <CardTitle>Messages reçus</CardTitle>
+                <CardDescription>Vos messages récents</CardDescription>
+                <div className="relative mt-2">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Rechercher dans les messages..."
+                    className="pl-8"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
                 </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsAddConseilDialogOpen(false)}>Annuler</Button>
-                  <Button onClick={handleAddConseil}>Planifier</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
-          
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Classe</TableHead>
-                  <TableHead>Trimestre</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Heure</TableHead>
-                  <TableHead>Lieu</TableHead>
-                  <TableHead>Participants</TableHead>
-                  <TableHead>Statut</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {conseilsClasse.map((conseil) => (
-                  <TableRow key={conseil.id}>
-                    <TableCell className="font-medium">{conseil.classe}</TableCell>
-                    <TableCell>{conseil.trimestre}</TableCell>
-                    <TableCell>{conseil.date}</TableCell>
-                    <TableCell>{conseil.heure}</TableCell>
-                    <TableCell>{conseil.lieu}</TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {conseil.participants.map((participant, index) => (
-                          <Badge key={index} variant="outline">
-                            {participant}
-                          </Badge>
-                        ))}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={conseil.statut === "Planifié" ? "success" : "warning"}>
-                        {conseil.statut}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon">
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={() => handleDeleteConseil(conseil.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="reunions">
-          <div className="flex justify-between mb-4">
-            <h2 className="text-xl font-semibold">Planification des réunions pédagogiques</h2>
-            <Dialog open={isAddReunionDialogOpen} onOpenChange={setIsAddReunionDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Planifier une réunion
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Planifier une réunion pédagogique</DialogTitle>
-                  <DialogDescription>
-                    Définissez les détails de la réunion pédagogique à planifier.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="space-y-2">
-                    <label htmlFor="titre" className="text-sm font-medium">Titre</label>
-                    <Input
-                      id="titre"
-                      value={nouvelleReunion.titre}
-                      onChange={(e) => setNouvelleReunion({...nouvelleReunion, titre: e.target.value})}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label htmlFor="date" className="text-sm font-medium">Date</label>
-                      <Input
-                        id="date"
-                        type="date"
-                        value={nouvelleReunion.date}
-                        onChange={(e) => setNouvelleReunion({...nouvelleReunion, date: e.target.value})}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor="heure" className="text-sm font-medium">Heure</label>
-                      <Input
-                        id="heure"
-                        type="time"
-                        value={nouvelleReunion.heure}
-                        onChange={(e) => setNouvelleReunion({...nouvelleReunion, heure: e.target.value})}
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="lieu" className="text-sm font-medium">Lieu</label>
-                    <Select 
-                      onValueChange={(value) => setNouvelleReunion({...nouvelleReunion, lieu: value})}
-                      value={nouvelleReunion.lieu}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner un lieu" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {lieuxList.map((lieu) => (
-                          <SelectItem key={lieu} value={lieu}>{lieu}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="participants" className="text-sm font-medium">Participants principaux</label>
-                    <Select 
-                      onValueChange={(value) => setNouvelleReunion({...nouvelleReunion, participants: value})}
-                      value={nouvelleReunion.participants}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner les participants" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {destinatairesList.map((destinataire) => (
-                          <SelectItem key={destinataire} value={destinataire}>{destinataire}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsAddReunionDialogOpen(false)}>Annuler</Button>
-                  <Button onClick={handleAddReunion}>Planifier</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
-          
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Réunion</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Heure</TableHead>
-                  <TableHead>Lieu</TableHead>
-                  <TableHead>Participants</TableHead>
-                  <TableHead>Statut</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {reunionsPedagogiques.map((reunion) => (
-                  <TableRow key={reunion.id}>
-                    <TableCell className="font-medium">{reunion.titre}</TableCell>
-                    <TableCell>{reunion.date}</TableCell>
-                    <TableCell>{reunion.heure}</TableCell>
-                    <TableCell>{reunion.lieu}</TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {reunion.participants.map((participant, index) => (
-                          <Badge key={index} variant="outline">
-                            {participant}
-                          </Badge>
-                        ))}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={reunion.statut === "Planifiée" ? "success" : "warning"}>
-                        {reunion.statut}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon">
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={() => handleDeleteReunion(reunion.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="communications">
-          <div className="grid gap-6 md:grid-cols-3">
-            <div className="md:col-span-2">
-              <div className="flex justify-between mb-4">
-                <h2 className="text-xl font-semibold">Communications récentes</h2>
-              </div>
-              
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Titre</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Destinataires</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Statut</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {communications.map((communication) => (
-                      <TableRow key={communication.id}>
-                        <TableCell className="font-medium">{communication.titre}</TableCell>
-                        <TableCell>{communication.date}</TableCell>
-                        <TableCell>
-                          <div className="flex flex-wrap gap-1">
-                            {communication.destinataires.map((destinataire, index) => (
-                              <Badge key={index} variant="outline">
-                                {destinataire}
-                              </Badge>
-                            ))}
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {messagesRecents
+                    .filter(msg => 
+                      msg.expediteur.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      msg.sujet.toLowerCase().includes(searchTerm.toLowerCase())
+                    )
+                    .map(message => (
+                      <div 
+                        key={message.id} 
+                        className={`p-3 border rounded-md cursor-pointer hover:bg-accent/50 transition-colors ${message.lu ? '' : 'bg-accent/20 border-primary/20'} ${selectedMessage?.id === message.id ? 'border-primary' : ''}`}
+                        onClick={() => setSelectedMessage(message)}
+                      >
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-medium">{message.expediteur}</h3>
+                              <Badge variant="default">Nouveau</Badge>
+                            </div>
+                            <p className="text-sm font-medium text-muted-foreground">{message.sujet}</p>
                           </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={
-                            communication.type === "Email" ? "secondary" :
-                            communication.type === "Notification" ? "primary" : "outline"
-                          }>
-                            {communication.type}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="success">
-                            {communication.statut}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
+                          <p className="text-xs text-muted-foreground">{message.date}</p>
+                        </div>
+                        <p className="text-sm mt-1 line-clamp-2">{message.contenu}</p>
+                      </div>
                     ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </div>
+                </div>
+              </CardContent>
+            </Card>
             
-            <div>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Nouvelle communication</CardTitle>
-                  <CardDescription>Envoyez un message ou une notification</CardDescription>
-                </CardHeader>
-                <CardContent>
+            <Card className="md:col-span-1">
+              <CardHeader>
+                <CardTitle>
+                  {selectedMessage ? selectedMessage.sujet : "Sélectionnez un message"}
+                </CardTitle>
+                {selectedMessage && (
+                  <CardDescription>
+                    De: {selectedMessage.expediteur} - {selectedMessage.date}
+                  </CardDescription>
+                )}
+              </CardHeader>
+              <CardContent>
+                {selectedMessage ? (
                   <div className="space-y-4">
-                    <div className="space-y-2">
-                      <label htmlFor="titre" className="text-sm font-medium">Titre</label>
-                      <Input
-                        id="titre"
-                        placeholder="Titre de la communication"
-                        value={nouvelleCommunication.titre}
-                        onChange={(e) => setNouvelleCommunication({...nouvelleCommunication, titre: e.target.value})}
-                      />
+                    <div className="whitespace-pre-line text-sm">
+                      {selectedMessage.contenu}
                     </div>
-                    <div className="space-y-2">
-                      <label htmlFor="message" className="text-sm font-medium">Message</label>
-                      <Textarea
-                        id="message"
-                        placeholder="Contenu du message"
-                        rows={4}
-                        value={nouvelleCommunication.message}
-                        onChange={(e) => setNouvelleCommunication({...nouvelleCommunication, message: e.target.value})}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor="destinataires" className="text-sm font-medium">Destinataires</label>
-                      <Select 
-                        onValueChange={(value) => setNouvelleCommunication({...nouvelleCommunication, destinataires: value})}
-                        value={nouvelleCommunication.destinataires}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner les destinataires" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {destinatairesList.map((destinataire) => (
-                            <SelectItem key={destinataire} value={destinataire}>{destinataire}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor="type" className="text-sm font-medium">Type de communication</label>
-                      <Select 
-                        onValueChange={(value) => setNouvelleCommunication({...nouvelleCommunication, type: value})}
-                        value={nouvelleCommunication.type}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner le type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {typesCommunicationList.map((type) => (
-                            <SelectItem key={type} value={type}>{type}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                    <div className="flex justify-end gap-2">
+                      <Button variant="outline">Marquer comme lu</Button>
+                      <Button onClick={() => {
+                        setActiveTab("nouveau");
+                        const contact = [...enseignants, ...administrationContacts].find(
+                          c => c.nom === selectedMessage.expediteur
+                        );
+                        setSelectedContact(contact);
+                        setMessageSubject(`Re: ${selectedMessage.sujet}`);
+                      }}>Répondre</Button>
                     </div>
                   </div>
-                </CardContent>
-                <CardFooter>
-                  <Button className="w-full" onClick={handleAddCommunication}>
-                    <MessageSquare className="mr-2 h-4 w-4" />
-                    Envoyer
-                  </Button>
-                </CardFooter>
-              </Card>
-              
-              <Card className="mt-4">
-                <CardHeader>
-                  <CardTitle>Calendrier des événements</CardTitle>
-                  <CardDescription>Vue d'ensemble des prochains événements</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10">
-                        <CalendarDays className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-medium">Conseils de classe 3ème</p>
-                        <p className="text-xs text-muted-foreground">15-18 avril 2025</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10">
-                        <Users className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-medium">Réunion équipe mathématiques</p>
-                        <p className="text-xs text-muted-foreground">18 avril 2025, 14h30</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10">
-                        <FileText className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-medium">Préparation examens</p>
-                        <p className="text-xs text-muted-foreground">25 avril 2025, 16h00</p>
-                      </div>
-                    </div>
+                ) : (
+                  <div className="text-center py-12 text-muted-foreground">
+                    Sélectionnez un message pour voir son contenu
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
+        </TabsContent>
+        
+        <TabsContent value="enseignants">
+          <Card>
+            <CardHeader>
+              <CardTitle>Enseignants</CardTitle>
+              <CardDescription>
+                Contacts des enseignants de la classe de Martin
+              </CardDescription>
+              <div className="relative mt-2">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Rechercher un enseignant..."
+                  className="pl-8"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {filteredEnseignants.map((enseignant) => (
+                  <div
+                    key={enseignant.id}
+                    className="p-4 border rounded-md hover:border-primary/50 transition-colors"
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h3 className="font-medium">{enseignant.nom}</h3>
+                        <p className="text-sm text-muted-foreground">{enseignant.matiere}</p>
+                      </div>
+                      {enseignant.principal && <Badge>Principal</Badge>}
+                    </div>
+                    <p className="text-sm text-primary mb-3">{enseignant.email}</p>
+                    <div className="flex justify-end">
+                      <Button onClick={() => {
+                        setSelectedContact(enseignant);
+                        setActiveTab("nouveau");
+                      }}>
+                        Contacter
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {filteredEnseignants.length === 0 && (
+                <div className="text-center py-8 text-muted-foreground">
+                  Aucun enseignant trouvé pour "{searchTerm}"
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="administration">
+          <Card>
+            <CardHeader>
+              <CardTitle>Administration</CardTitle>
+              <CardDescription>
+                Contacts des services administratifs
+              </CardDescription>
+              <div className="relative mt-2">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Rechercher un service..."
+                  className="pl-8"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {filteredAdminContacts.map((contact) => (
+                  <div
+                    key={contact.id}
+                    className="p-4 border rounded-md hover:border-primary/50 transition-colors"
+                  >
+                    <h3 className="font-medium">{contact.nom}</h3>
+                    <p className="text-sm text-muted-foreground mb-2">{contact.description}</p>
+                    <p className="text-sm text-primary mb-3">{contact.email}</p>
+                    <div className="flex justify-end">
+                      <Button onClick={() => {
+                        setSelectedContact(contact);
+                        setActiveTab("nouveau");
+                      }}>
+                        Contacter
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {filteredAdminContacts.length === 0 && (
+                <div className="text-center py-8 text-muted-foreground">
+                  Aucun service administratif trouvé pour "{searchTerm}"
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="nouveau">
+          <Card>
+            <CardHeader>
+              <CardTitle>Nouveau message</CardTitle>
+              <CardDescription>
+                {selectedContact 
+                  ? `À: ${selectedContact.nom} (${selectedContact.email})`
+                  : "Sélectionnez un destinataire"}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {selectedContact ? (
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="subject" className="block text-sm font-medium mb-1">
+                      Sujet
+                    </label>
+                    <Input
+                      id="subject"
+                      placeholder="Entrez l'objet de votre message"
+                      value={messageSubject}
+                      onChange={(e) => setMessageSubject(e.target.value)}
+                    />
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="message" className="block text-sm font-medium mb-1">
+                      Message
+                    </label>
+                    <Textarea
+                      id="message"
+                      placeholder="Rédigez votre message..."
+                      rows={8}
+                      value={messageContent}
+                      onChange={(e) => setMessageContent(e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="flex justify-end gap-2">
+                    <Button variant="outline" onClick={() => {
+                      setSelectedContact(null);
+                      setMessageSubject("");
+                      setMessageContent("");
+                    }}>
+                      Annuler
+                    </Button>
+                    <Button 
+                      disabled={!messageSubject || !messageContent}
+                      onClick={handleSendMessage}
+                    >
+                      Envoyer
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground mb-4">
+                    Veuillez d'abord sélectionner un destinataire.
+                  </p>
+                  <div className="flex justify-center gap-4">
+                    <Button onClick={() => setActiveTab("enseignants")}>
+                      Choisir un enseignant
+                    </Button>
+                    <Button onClick={() => setActiveTab("administration")}>
+                      Choisir un service administratif
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
