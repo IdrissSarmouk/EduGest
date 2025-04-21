@@ -12,12 +12,12 @@ const AdminLayout = () => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   
   return (
-    <div className="admin-layout">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {isMobile ? (
-        <>
-          <div className="fixed top-0 left-0 right-0 z-50 bg-background border-b">
+        <div className="flex flex-col h-screen">
+          <div className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-b dark:border-gray-700 shadow-sm">
             <div className="container flex justify-between items-center p-4">
-              <h1 className="text-lg font-bold text-primary">Administration - École Avenir Digital</h1>
+              <h1 className="text-lg font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">École Avenir Digital</h1>
               <Button 
                 variant="ghost" 
                 size="icon" 
@@ -29,28 +29,32 @@ const AdminLayout = () => {
           </div>
           
           {showMobileMenu && (
-            <div className="fixed top-16 left-0 right-0 bottom-0 z-40 bg-background">
+            <div className="fixed top-16 left-0 right-0 bottom-0 z-40 bg-white dark:bg-gray-800">
               <AdminSidebar />
             </div>
           )}
           
-          <div className="pt-16">
+          <div className="pt-16 flex-1">
             <Header />
-            <main className="container p-4">
+            <main className="container p-4 mx-auto">
               <Outlet />
             </main>
           </div>
-        </>
+        </div>
       ) : (
-        <>
-          <AdminSidebar />
-          <div>
+        <div className="flex h-screen overflow-hidden">
+          <div className="w-64 flex-shrink-0 border-r border-gray-200 dark:border-gray-700">
+            <AdminSidebar />
+          </div>
+          <div className="flex-1 flex flex-col h-screen overflow-auto">
             <Header />
-            <main className="container py-6 px-4">
-              <Outlet />
+            <main className="flex-1 p-6 overflow-y-auto">
+              <div className="container max-w-7xl mx-auto">
+                <Outlet />
+              </div>
             </main>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

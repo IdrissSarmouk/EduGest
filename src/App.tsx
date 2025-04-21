@@ -20,6 +20,7 @@ import AdminEleves from "./pages/admin/Eleves";
 import AdminEmploiDuTemps from "./pages/admin/EmploiDuTemps";
 import AdminAbsences from "./pages/admin/Absences";
 import AdminCommunication from "./pages/admin/Communication";
+import AdminReunions from "./pages/admin/Reunions";
 import ParentLayout from "./components/ParentLayout";
 import ParentDashboard from "./pages/parent/Dashboard";
 import ParentNotes from "./pages/parent/Notes";
@@ -54,6 +55,7 @@ const App = () => (
             <Route path="emploi-du-temps" element={<AdminEmploiDuTemps />} />
             <Route path="absences" element={<AdminAbsences />} />
             <Route path="communication" element={<AdminCommunication />} />
+            <Route path="reunions" element={<AdminReunions />} />
           </Route>
           <Route path="/parent" element={<ParentLayout />}>
             <Route index element={<ParentDashboard />} />

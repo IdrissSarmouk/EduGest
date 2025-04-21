@@ -1,5 +1,5 @@
 
-import { Bell } from "lucide-react";
+import { Bell, Settings, LogOut } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,13 +10,77 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
+import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 const Header = () => {
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith('/admin');
+  const isParent = location.pathname.startsWith('/parent');
+  
   return (
-    <header className="border-b bg-card">
+    <header className="border-b bg-white dark:bg-gray-800 dark:border-gray-700 sticky top-0 z-10">
       <div className="container flex h-16 items-center justify-between px-4">
         <div className="flex items-center">
-          <h2 className="text-lg font-semibold md:text-xl">Bienvenue, Martin</h2>
+          {!isAdmin && !isParent && (
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <Link to="/" className={navigationMenuTriggerStyle()}>
+                    Accueil
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link to="/notes" className={navigationMenuTriggerStyle()}>
+                    Notes
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>Documents</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-[300px] gap-3 p-4">
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <Link
+                            to="/bulletins"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          >
+                            <div className="text-sm font-medium leading-none">Bulletins</div>
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                              Consultez vos bulletins scolaires
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <Link
+                            to="/documents"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          >
+                            <div className="text-sm font-medium leading-none">Documents</div>
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                              Tous vos documents administratifs
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          )}
         </div>
         
         <div className="flex items-center gap-4">
@@ -57,7 +121,29 @@ const Header = () => {
             </DropdownMenuContent>
           </DropdownMenu>
           
-          <Button variant="outline">Déconnexion</Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="gap-2">
+                <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center text-primary font-medium">
+                  {isAdmin ? 'A' : (isParent ? 'P' : 'M')}
+                </div>
+                <span className="hidden md:inline-block">
+                  {isAdmin ? 'Administrateur' : (isParent ? 'Parent' : 'Martin')}
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Paramètres</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Déconnexion</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>
