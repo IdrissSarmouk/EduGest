@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/tabs";
 import { UserPlus, Search, Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 
 // Données simulées des élèves
 const elevesMock = [
@@ -57,6 +58,7 @@ const AdminEleves = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [classeFilter, setClasseFilter] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [newEleve, setNewEleve] = useState({
     nom: "",
     prenom: "",
@@ -65,6 +67,17 @@ const AdminEleves = () => {
     email: "",
     option1: "",
     option2: ""
+  });
+  const [editingEleve, setEditingEleve] = useState({
+    id: 0,
+    nom: "",
+    prenom: "",
+    classe: "",
+    dateNaissance: "",
+    email: "",
+    option1: "",
+    option2: "",
+    absences: 0
   });
 
   // Filtre les élèves en fonction de la recherche et de la classe
@@ -104,10 +117,47 @@ const AdminEleves = () => {
     setEleves([...eleves, newEleveRecord]);
     setNewEleve({ nom: "", prenom: "", classe: "", dateNaissance: "", email: "", option1: "", option2: "" });
     setIsAddDialogOpen(false);
+    toast.success("Élève ajouté avec succès !");
+  };
+
+  const handleEditEleve = () => {
+    const options = [editingEleve.option1];
+    if (editingEleve.option2) options.push(editingEleve.option2);
+    
+    const updatedEleve = {
+      id: editingEleve.id,
+      nom: editingEleve.nom,
+      prenom: editingEleve.prenom,
+      classe: editingEleve.classe,
+      dateNaissance: editingEleve.dateNaissance,
+      email: editingEleve.email,
+      options,
+      absences: editingEleve.absences
+    };
+    
+    setEleves(eleves.map(e => e.id === editingEleve.id ? updatedEleve : e));
+    setIsEditDialogOpen(false);
+    toast.success("Informations de l'élève mises à jour !");
   };
 
   const handleDeleteEleve = (id: number) => {
     setEleves(eleves.filter(e => e.id !== id));
+    toast.success("Élève supprimé avec succès !");
+  };
+
+  const openEditDialog = (eleve: any) => {
+    setEditingEleve({
+      id: eleve.id,
+      nom: eleve.nom,
+      prenom: eleve.prenom,
+      classe: eleve.classe,
+      dateNaissance: eleve.dateNaissance,
+      email: eleve.email,
+      option1: eleve.options[0] || "",
+      option2: eleve.options[1] || "",
+      absences: eleve.absences
+    });
+    setIsEditDialogOpen(true);
   };
 
   return (
@@ -302,7 +352,11 @@ const AdminEleves = () => {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon">
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => openEditDialog(eleve)}
+                        >
                           <Pencil className="h-4 w-4" />
                         </Button>
                         <Button 
@@ -361,7 +415,11 @@ const AdminEleves = () => {
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-2">
-                              <Button variant="ghost" size="icon">
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                onClick={() => openEditDialog(eleve)}
+                              >
                                 <Pencil className="h-4 w-4" />
                               </Button>
                               <Button 
@@ -383,6 +441,125 @@ const AdminEleves = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Dialog de modification */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Modifier les informations de l'élève</DialogTitle>
+            <DialogDescription>
+              Modifiez les informations de {editingEleve.prenom} {editingEleve.nom}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label htmlFor="edit-nom" className="text-sm font-medium">Nom</label>
+                <Input
+                  id="edit-nom"
+                  value={editingEleve.nom}
+                  onChange={(e) => setEditingEleve({...editingEleve, nom: e.target.value})}
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="edit-prenom" className="text-sm font-medium">Prénom</label>
+                <Input
+                  id="edit-prenom"
+                  value={editingEleve.prenom}
+                  onChange={(e) => setEditingEleve({...editingEleve, prenom: e.target.value})}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="edit-classe" className="text-sm font-medium">Classe</label>
+              <Select 
+                onValueChange={(value) => setEditingEleve({...editingEleve, classe: value})}
+                value={editingEleve.classe}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner une classe" />
+                </SelectTrigger>
+                <SelectContent>
+                  {classesList.map((classe) => (
+                    <SelectItem key={classe} value={classe}>
+                      {classe}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="edit-dateNaissance" className="text-sm font-medium">Date de naissance</label>
+              <Input
+                id="edit-dateNaissance"
+                type="date"
+                value={editingEleve.dateNaissance}
+                onChange={(e) => setEditingEleve({...editingEleve, dateNaissance: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="edit-email" className="text-sm font-medium">Email</label>
+              <Input
+                id="edit-email"
+                type="email"
+                value={editingEleve.email}
+                onChange={(e) => setEditingEleve({...editingEleve, email: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="edit-option1" className="text-sm font-medium">Option 1</label>
+              <Select 
+                onValueChange={(value) => setEditingEleve({...editingEleve, option1: value})}
+                value={editingEleve.option1}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner une option" />
+                </SelectTrigger>
+                <SelectContent>
+                  {optionsList.map((option) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="edit-option2" className="text-sm font-medium">Option 2 (facultatif)</label>
+              <Select 
+                onValueChange={(value) => setEditingEleve({...editingEleve, option2: value})}
+                value={editingEleve.option2}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner une option" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Aucune</SelectItem>
+                  {optionsList.map((option) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="edit-absences" className="text-sm font-medium">Nombre d'absences</label>
+              <Input
+                id="edit-absences"
+                type="number"
+                min="0"
+                value={editingEleve.absences}
+                onChange={(e) => setEditingEleve({...editingEleve, absences: parseInt(e.target.value, 10) || 0})}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Annuler</Button>
+            <Button onClick={handleEditEleve}>Enregistrer les modifications</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
