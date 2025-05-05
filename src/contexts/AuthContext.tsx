@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
 
 // Define user roles
-export type UserRole = 'admin' | 'parent' | 'student' | null;
+export type UserRole = 'admin' | 'parent' | 'student' | 'teacher' | null;
 
 // Define user interface
 interface User {
@@ -61,6 +61,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       role = 'parent';
     } else if (userId === 'eleve1') {
       role = 'student';
+    } else if (userId === 'enseignant1') {
+      role = 'teacher';
     } else {
       toast.error("Identifiant inconnu");
       return false;
@@ -81,6 +83,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         break;
       case 'student':
         navigate('/');
+        break;
+      case 'teacher':
+        navigate('/enseignant');
         break;
     }
     

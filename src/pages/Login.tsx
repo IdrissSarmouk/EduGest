@@ -68,6 +68,7 @@ const Login = () => {
               <div className="text-sm text-muted-foreground">
                 <p>Comptes de test:</p>
                 <p>- Admin: admin1 / 1234</p>
+                <p>- Enseignant: enseignant1 / 1234</p>
                 <p>- Parent: parent1 / 1234</p>
                 <p>- Élève: eleve1 / 1234</p>
               </div>

@@ -33,6 +33,19 @@ import Login from "./pages/Login";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+// Import de l'espace enseignant
+import TeacherLayout from "./components/TeacherLayout";
+import TeacherDashboard from "./pages/teacher/Dashboard";
+import TeacherNotes from "./pages/teacher/Notes";
+import TeacherBulletins from "./pages/teacher/Bulletins";
+import TeacherAbsences from "./pages/teacher/Absences";
+import TeacherEleves from "./pages/teacher/Eleves";
+import TeacherCommunication from "./pages/teacher/Communication";
+import TeacherDocuments from "./pages/teacher/Documents";
+import TeacherCalendrier from "./pages/teacher/Calendrier";
+import TeacherNotifications from "./pages/teacher/Notifications";
+import TeacherProfil from "./pages/teacher/Profil";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -69,6 +82,22 @@ const App = () => (
                 <Route path="absences" element={<AdminAbsences />} />
                 <Route path="communication" element={<AdminCommunication />} />
                 <Route path="reunions" element={<AdminReunions />} />
+              </Route>
+            </Route>
+            
+            {/* Teacher routes */}
+            <Route element={<ProtectedRoute allowedRoles={['teacher']} />}>
+              <Route path="/enseignant" element={<TeacherLayout />}>
+                <Route index element={<TeacherDashboard />} />
+                <Route path="notes" element={<TeacherNotes />} />
+                <Route path="bulletins" element={<TeacherBulletins />} />
+                <Route path="absences" element={<TeacherAbsences />} />
+                <Route path="eleves" element={<TeacherEleves />} />
+                <Route path="communication" element={<TeacherCommunication />} />
+                <Route path="documents" element={<TeacherDocuments />} />
+                <Route path="calendrier" element={<TeacherCalendrier />} />
+                <Route path="notifications" element={<TeacherNotifications />} />
+                <Route path="profil" element={<TeacherProfil />} />
               </Route>
             </Route>
             
