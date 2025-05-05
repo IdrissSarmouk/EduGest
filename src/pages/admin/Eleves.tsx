@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -101,7 +100,7 @@ const AdminEleves = () => {
   const handleAddEleve = () => {
     const newId = Math.max(...eleves.map(e => e.id)) + 1;
     const options = [newEleve.option1];
-    if (newEleve.option2) options.push(newEleve.option2);
+    if (newEleve.option2 && newEleve.option2 !== "none") options.push(newEleve.option2);
     
     const newEleveRecord = {
       id: newId,
@@ -122,7 +121,7 @@ const AdminEleves = () => {
 
   const handleEditEleve = () => {
     const options = [editingEleve.option1];
-    if (editingEleve.option2) options.push(editingEleve.option2);
+    if (editingEleve.option2 && editingEleve.option2 !== "none") options.push(editingEleve.option2);
     
     const updatedEleve = {
       id: editingEleve.id,
@@ -297,7 +296,7 @@ const AdminEleves = () => {
                         <SelectValue placeholder="Sélectionner une option" />
                       </SelectTrigger>
                       <SelectContent>
-                        {/* Changed from "aucune" to "none" with a proper value */}
+                        {/* Changed from "none" with empty string value to a non-empty string value */}
                         <SelectItem key="none" value="none">Aucune</SelectItem>
                         {optionsList.map((option) => (
                           <SelectItem key={option} value={option}>
@@ -535,7 +534,7 @@ const AdminEleves = () => {
                   <SelectValue placeholder="Sélectionner une option" />
                 </SelectTrigger>
                 <SelectContent>
-                  {/* Changed from "aucune" to "none" with a proper value */}
+                  {/* Changed from "none" to a non-empty string value */}
                   <SelectItem key="none" value="none">Aucune</SelectItem>
                   {optionsList.map((option) => (
                     <SelectItem key={option} value={option}>
