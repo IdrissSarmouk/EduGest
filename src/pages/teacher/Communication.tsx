@@ -24,7 +24,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
-import { PaperPlaneIcon, PlusCircleIcon, Users, UserPlus, AtSign, School, Bell } from "lucide-react";
+import { PlusCircle, Users, UserPlus, AtSign, School, Bell, Send } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Search } from "lucide-react";
 
@@ -165,7 +165,7 @@ const TeacherCommunication = () => {
                   <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                     <DialogTrigger asChild>
                       <Button size="sm" variant="outline">
-                        <PlusCircleIcon className="h-4 w-4 mr-1" />
+                        <PlusCircle className="h-4 w-4 mr-1" />
                         Nouveau
                       </Button>
                     </DialogTrigger>
@@ -377,7 +377,7 @@ const TeacherCommunication = () => {
                           className="min-h-[80px]"
                         />
                         <Button className="self-end" onClick={handleSendMessage}>
-                          <PaperPlaneIcon className="h-4 w-4" />
+                          <Send className="h-4 w-4" />
                           <span className="sr-only">Envoyer</span>
                         </Button>
                       </div>
@@ -405,7 +405,7 @@ const TeacherCommunication = () => {
               <div className="flex justify-between">
                 <CardTitle>Annonces et informations</CardTitle>
                 <Button>
-                  <PlusCircleIcon className="h-4 w-4 mr-2" />
+                  <PlusCircle className="h-4 w-4 mr-2" />
                   Nouvelle annonce
                 </Button>
               </div>
