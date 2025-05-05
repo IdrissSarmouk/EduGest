@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import Dashboard from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -29,6 +29,9 @@ import ParentAbsences from "./pages/parent/Absences";
 import ParentCalendrier from "./pages/parent/Calendrier";
 import ParentCommunication from "./pages/parent/Communication";
 import ParentNotifications from "./pages/parent/Notifications";
+import Login from "./pages/Login";
+import { AuthProvider } from "./contexts/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -38,36 +41,70 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="/notes" element={<NotesPage />} />
-            <Route path="/bulletins" element={<BulletinsPage />} />
-            <Route path="/emploi-du-temps" element={<EmploiDuTempsPage />} />
-            <Route path="/absences" element={<AbsencesPage />} />
-            <Route path="/notifications" element={<NotificationsPage />} />
-            <Route path="/documents" element={<DocumentsPage />} />
-          </Route>
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminDashboard />} />
-            <Route path="enseignants" element={<AdminEnseignants />} />
-            <Route path="eleves" element={<AdminEleves />} />
-            <Route path="emploi-du-temps" element={<AdminEmploiDuTemps />} />
-            <Route path="absences" element={<AdminAbsences />} />
-            <Route path="communication" element={<AdminCommunication />} />
-            <Route path="reunions" element={<AdminReunions />} />
-          </Route>
-          <Route path="/parent" element={<ParentLayout />}>
-            <Route index element={<ParentDashboard />} />
-            <Route path="notes" element={<ParentNotes />} />
-            <Route path="bulletins" element={<ParentBulletins />} />
-            <Route path="absences" element={<ParentAbsences />} />
-            <Route path="calendrier" element={<ParentCalendrier />} />
-            <Route path="communication" element={<ParentCommunication />} />
-            <Route path="notifications" element={<ParentNotifications />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            {/* Public route */}
+            <Route path="/login" element={<Login />} />
+            
+            {/* Student routes */}
+            <Route element={<ProtectedRoute allowedRoles={['student']} />}>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Dashboard />} />
+                <Route path="/notes" element={<NotesPage />} />
+                <Route path="/bulletins" element={<BulletinsPage />} />
+                <Route path="/emploi-du-temps" element={<EmploiDuTempsPage />} />
+                <Route path="/absences" element={<AbsencesPage />} />
+                <Route path="/notifications" element={<NotificationsPage />} />
+                <Route path="/documents" element={<DocumentsPage />} />
+              </Route>
+            </Route>
+            
+            {/* Admin routes */}
+            <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="enseignants" element={<AdminEnseignants />} />
+                <Route path="eleves" element={<AdminEleves />} />
+                <Route path="emploi-du-temps" element={<AdminEmploiDuTemps />} />
+                <Route path="absences" element={<AdminAbsences />} />
+                <Route path="communication" element={<AdminCommunication />} />
+                <Route path="reunions" element={<AdminReunions />} />
+              </Route>
+            </Route>
+            
+            {/* Parent routes */}
+            <Route element={<ProtectedRoute allowedRoles={['parent']} />}>
+              <Route path="/parent" element={<ParentLayout />}>
+                <Route index element={<ParentDashboard />} />
+                <Route path="notes" element={<ParentNotes />} />
+                <Route path="bulletins" element={<ParentBulletins />} />
+                <Route path="absences" element={<ParentAbsences />} />
+                <Route path="calendrier" element={<ParentCalendrier />} />
+                <Route path="communication" element={<ParentCommunication />} />
+                <Route path="notifications" element={<ParentNotifications />} />
+              </Route>
+            </Route>
+            
+            {/* Student sections accessible to parents */}
+            <Route element={<ProtectedRoute allowedRoles={['parent']} redirectTo="/parent" />}>
+              <Route path="/eleve" element={<Layout />}>
+                <Route index element={<Dashboard />} />
+                <Route path="notes" element={<NotesPage />} />
+                <Route path="bulletins" element={<BulletinsPage />} />
+                <Route path="emploi-du-temps" element={<EmploiDuTempsPage />} />
+                <Route path="absences" element={<AbsencesPage />} />
+                <Route path="notifications" element={<NotificationsPage />} />
+                <Route path="documents" element={<DocumentsPage />} />
+              </Route>
+            </Route>
+            
+            {/* Redirect to login if not authenticated */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            
+            {/* 404 route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
