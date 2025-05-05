@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
@@ -451,7 +450,7 @@ const TeacherCommunication = () => {
               <div className="flex justify-between">
                 <CardTitle>Devoirs & documents pédagogiques</CardTitle>
                 <Button>
-                  <PlusCircleIcon className="h-4 w-4 mr-2" />
+                  <PlusCircle className="h-4 w-4 mr-2" />
                   Ajouter un devoir
                 </Button>
               </div>
