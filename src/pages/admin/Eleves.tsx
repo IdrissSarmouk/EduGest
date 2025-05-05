@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -296,7 +297,8 @@ const AdminEleves = () => {
                         <SelectValue placeholder="Sélectionner une option" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem key="aucune" value="aucune">Aucune</SelectItem>
+                        {/* Changed from "aucune" to "none" with a proper value */}
+                        <SelectItem key="none" value="none">Aucune</SelectItem>
                         {optionsList.map((option) => (
                           <SelectItem key={option} value={option}>
                             {option}
@@ -533,7 +535,8 @@ const AdminEleves = () => {
                   <SelectValue placeholder="Sélectionner une option" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem key="aucune" value="aucune">Aucune</SelectItem>
+                  {/* Changed from "aucune" to "none" with a proper value */}
+                  <SelectItem key="none" value="none">Aucune</SelectItem>
                   {optionsList.map((option) => (
                     <SelectItem key={option} value={option}>
                       {option}
