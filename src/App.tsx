@@ -11,7 +11,6 @@ import NotesPage from "./pages/Notes";
 import BulletinsPage from "./pages/Bulletins";
 import EmploiDuTempsPage from "./pages/EmploiDuTemps";
 import AbsencesPage from "./pages/Absences";
-import NotificationsPage from "./pages/Notifications";
 import DocumentsPage from "./pages/Documents";
 import AdminLayout from "./components/AdminLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -28,8 +27,8 @@ import ParentBulletins from "./pages/parent/Bulletins";
 import ParentAbsences from "./pages/parent/Absences";
 import ParentCalendrier from "./pages/parent/Calendrier";
 import ParentCommunication from "./pages/parent/Communication";
-import ParentNotifications from "./pages/parent/Notifications";
 import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -43,7 +42,6 @@ import TeacherEleves from "./pages/teacher/Eleves";
 import TeacherCommunication from "./pages/teacher/Communication";
 import TeacherDocuments from "./pages/teacher/Documents";
 import TeacherCalendrier from "./pages/teacher/Calendrier";
-import TeacherNotifications from "./pages/teacher/Notifications";
 import TeacherProfil from "./pages/teacher/Profil";
 
 const queryClient = new QueryClient();
@@ -56,8 +54,9 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <Routes>
-            {/* Public route */}
+            {/* Public routes */}
             <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
             
             {/* Student routes */}
             <Route element={<ProtectedRoute allowedRoles={['student']} />}>
@@ -67,7 +66,6 @@ const App = () => (
                 <Route path="/bulletins" element={<BulletinsPage />} />
                 <Route path="/emploi-du-temps" element={<EmploiDuTempsPage />} />
                 <Route path="/absences" element={<AbsencesPage />} />
-                <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/documents" element={<DocumentsPage />} />
               </Route>
             </Route>
@@ -96,7 +94,6 @@ const App = () => (
                 <Route path="communication" element={<TeacherCommunication />} />
                 <Route path="documents" element={<TeacherDocuments />} />
                 <Route path="calendrier" element={<TeacherCalendrier />} />
-                <Route path="notifications" element={<TeacherNotifications />} />
                 <Route path="profil" element={<TeacherProfil />} />
               </Route>
             </Route>
@@ -110,7 +107,6 @@ const App = () => (
                 <Route path="absences" element={<ParentAbsences />} />
                 <Route path="calendrier" element={<ParentCalendrier />} />
                 <Route path="communication" element={<ParentCommunication />} />
-                <Route path="notifications" element={<ParentNotifications />} />
               </Route>
             </Route>
             
@@ -122,7 +118,6 @@ const App = () => (
                 <Route path="bulletins" element={<BulletinsPage />} />
                 <Route path="emploi-du-temps" element={<EmploiDuTempsPage />} />
                 <Route path="absences" element={<AbsencesPage />} />
-                <Route path="notifications" element={<NotificationsPage />} />
                 <Route path="documents" element={<DocumentsPage />} />
               </Route>
             </Route>

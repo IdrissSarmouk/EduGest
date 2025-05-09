@@ -6,21 +6,37 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-const Login = () => {
+const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login } = useAuth();
+  const { signup } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Simple validation
+    if (!email || !password) {
+      return;
+    }
+    
+    if (password !== confirmPassword) {
+      alert("Les mots de passe ne correspondent pas.");
+      return;
+    }
+    
     setIsSubmitting(true);
     
     try {
-      await login(email, password);
+      const success = await signup(email, password);
+      if (success) {
+        navigate('/login');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -34,9 +50,9 @@ const Login = () => {
             <div className="mx-auto mb-2">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">École Avenir Digital</h1>
             </div>
-            <CardTitle className="text-2xl">Connexion</CardTitle>
+            <CardTitle className="text-2xl">Inscription</CardTitle>
             <CardDescription>
-              Connectez-vous pour accéder à votre espace
+              Créez votre compte pour accéder à la plateforme
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
@@ -51,6 +67,9 @@ const Login = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
+                <p className="text-xs text-muted-foreground">
+                  Utilisez un email se terminant par @admin.com, @teacher.com, ou @parent.com pour ces rôles spécifiques.
+                </p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Mot de passe</Label>
@@ -74,6 +93,19 @@ const Login = () => {
                   </Button>
                 </div>
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Confirmez votre mot de passe"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
             </CardContent>
             <CardFooter className="flex-col space-y-2">
               <Button 
@@ -81,10 +113,10 @@ const Login = () => {
                 className="w-full"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Connexion en cours..." : "Se connecter"}
+                {isSubmitting ? "Inscription en cours..." : "S'inscrire"}
               </Button>
               <div className="text-center text-sm text-muted-foreground">
-                Pas encore de compte? <Link to="/signup" className="text-primary hover:underline">S'inscrire</Link>
+                Déjà un compte? <Link to="/login" className="text-primary hover:underline">Se connecter</Link>
               </div>
             </CardFooter>
           </form>
@@ -94,4 +126,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;

@@ -11,13 +11,24 @@ const ProtectedRoute = ({
   allowedRoles,
   redirectTo = "/login" 
 }: ProtectedRouteProps) => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
+  // Show loading state or spinner while authentication state is being determined
+  if (loading) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  // Redirect to login if user is not authenticated
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  if (!allowedRoles.includes(user.role)) {
+  // Redirect to specified route if user doesn't have required role
+  if (user.role && !allowedRoles.includes(user.role)) {
     return <Navigate to={redirectTo} replace />;
   }
 
