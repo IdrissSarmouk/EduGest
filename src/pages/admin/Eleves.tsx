@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -192,7 +193,7 @@ const AdminEleves = () => {
                   <SelectValue placeholder="Toutes les classes" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Toutes les classes</SelectItem>
+                  <SelectItem value="toutes">Toutes les classes</SelectItem>
                   {classesList.map((classe) => (
                     <SelectItem key={classe} value={classe}>{classe}</SelectItem>
                   ))}
@@ -296,8 +297,7 @@ const AdminEleves = () => {
                         <SelectValue placeholder="Sélectionner une option" />
                       </SelectTrigger>
                       <SelectContent>
-                        {/* Changed from "none" with empty string value to a non-empty string value */}
-                        <SelectItem key="none" value="none">Aucune</SelectItem>
+                        <SelectItem value="none">Aucune</SelectItem>
                         {optionsList.map((option) => (
                           <SelectItem key={option} value={option}>
                             {option}
@@ -534,8 +534,7 @@ const AdminEleves = () => {
                   <SelectValue placeholder="Sélectionner une option" />
                 </SelectTrigger>
                 <SelectContent>
-                  {/* Changed from "none" to a non-empty string value */}
-                  <SelectItem key="none" value="none">Aucune</SelectItem>
+                  <SelectItem value="none">Aucune</SelectItem>
                   {optionsList.map((option) => (
                     <SelectItem key={option} value={option}>
                       {option}

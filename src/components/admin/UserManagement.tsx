@@ -48,7 +48,7 @@ const UserManagement = () => {
       setUsers(
         authUsers.map((user) => ({
           id: user.id,
-          email: user.username ? `${user.username}@${user.role === 'admin' ? 'admin' : user.role === 'teacher' ? 'teacher' : user.role === 'parent' ? 'parent' : 'student'}.com` : "unknown",
+          email: user.username ? `${user.username}@${user.role === 'admin' ? 'admin' : user.role === 'teacher' ? 'teacher' : user.role === 'parent' ? 'parent' : user.role === 'student'}.com` : "unknown",
           role: user.role as UserRole,
           created_at: new Date(user.created_at).toLocaleDateString(),
         }))
