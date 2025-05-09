@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -106,7 +107,7 @@ const Login = () => {
                 {isSubmitting ? "Connexion en cours..." : "Se connecter"}
               </Button>
               <div className="text-center text-sm text-muted-foreground">
-                Pas encore de compte? <Link to="/signup" className="text-primary hover:underline">S'inscrire</Link>
+                Contactez l'administrateur pour obtenir vos identifiants de connexion.
               </div>
             </CardFooter>
           </form>
