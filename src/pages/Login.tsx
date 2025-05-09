@@ -7,20 +7,37 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [emailNotVerified, setEmailNotVerified] = useState(false);
   const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setEmailNotVerified(false);
     
     try {
-      await login(email, password);
+      const success = await login(email, password);
+      if (!success) {
+        // Check if this might be due to unverified email
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        if (error?.message?.includes("Email not confirmed")) {
+          setEmailNotVerified(true);
+          toast.error("Email non vérifié. Veuillez vérifier votre boîte de réception.");
+        }
+      }
+    } catch (error) {
+      console.error("Login error:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -41,6 +58,11 @@ const Login = () => {
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
+              {emailNotVerified && (
+                <div className="p-3 rounded bg-yellow-50 border border-yellow-200 text-yellow-800">
+                  <p className="text-sm">Votre email n'a pas été vérifié. Veuillez vérifier votre boîte de réception et cliquer sur le lien de confirmation.</p>
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
